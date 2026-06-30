@@ -165,28 +165,14 @@ func findOracleRuby(t *testing.T) string {
 	return ruby
 }
 
-func TestDifferentialVsMRI(t *testing.T) {
-	ruby := findOracleRuby(t)
-	if ruby == "" {
-		t.Skip("no Reline-0.6 ruby available; deterministic tests cover behavior")
-	}
-	scenarios := differentialScenarios()
-	payload, err := json.Marshal(scenarios)
-	if err != nil {
-		t.Fatal(err)
-	}
-	cmd := exec.Command(ruby, "-rjson", "-e", rubyOracleScript)
-	cmd.Stdin = strings.NewReader(string(payload))
-	stdout, err := cmd.Output()
-	if err != nil {
-		t.Fatalf("ruby oracle failed: %v", err)
-	}
-	var want []oracleResult
-	if err := json.Unmarshal(stdout, &want); err != nil {
-		t.Fatalf("decode oracle output %q: %v", stdout, err)
-	}
+// compareScenarios replays every scenario through the Go editor and checks the
+// resulting line/cursor/finished/eof against the expected MRI results. Shared by
+// the deterministic golden test (runs everywhere, including Windows) and the
+// live-ruby differential test.
+func compareScenarios(t *testing.T, scenarios []scenario, want []oracleResult) {
+	t.Helper()
 	if len(want) != len(scenarios) {
-		t.Fatalf("oracle returned %d results, want %d", len(want), len(scenarios))
+		t.Fatalf("got %d results, want %d", len(want), len(scenarios))
 	}
 	for i, sc := range scenarios {
 		le, run := toScenarioRunner(sc)
@@ -211,4 +197,102 @@ func TestDifferentialVsMRI(t *testing.T) {
 			t.Errorf("[%s] eof: got %v want %v", sc.Name, le.EOF(), w.EOF)
 		}
 	}
+}
+
+// runRubyOracle feeds the scenarios to MRI Reline and returns its results.
+func runRubyOracle(t *testing.T, ruby string, scenarios []scenario) []oracleResult {
+	t.Helper()
+	payload, err := json.Marshal(scenarios)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cmd := exec.Command(ruby, "-rjson", "-e", rubyOracleScript)
+	cmd.Stdin = strings.NewReader(string(payload))
+	stdout, err := cmd.Output()
+	if err != nil {
+		t.Fatalf("ruby oracle failed: %v", err)
+	}
+	var want []oracleResult
+	if err := json.Unmarshal(stdout, &want); err != nil {
+		t.Fatalf("decode oracle output %q: %v", stdout, err)
+	}
+	return want
+}
+
+// TestDifferentialGolden compares the Go editor against MRI results captured in
+// oracle_golden.json. It is deterministic and ruby-free, so it runs on every OS
+// (including Windows) and keeps the comparison path covered there. Regenerate
+// the golden file with: RELINE_RUBY=$(which ruby) go test -run TestRegenGolden.
+func TestDifferentialGolden(t *testing.T) {
+	data, err := os.ReadFile("oracle_golden.json")
+	if err != nil {
+		t.Fatalf("read golden: %v", err)
+	}
+	var want []oracleResult
+	if err := json.Unmarshal(data, &want); err != nil {
+		t.Fatalf("decode golden: %v", err)
+	}
+	compareScenarios(t, differentialScenarios(), want)
+}
+
+// TestDifferentialVsMRI runs the same scenarios through a live MRI Reline (when
+// available) to guarantee the committed golden file still matches the real
+// oracle. Gated on a Reline-0.6 ruby; self-skips otherwise.
+func TestDifferentialVsMRI(t *testing.T) {
+	ruby := findOracleRuby(t)
+	if ruby == "" {
+		t.Skip("no Reline-0.6 ruby available; the golden test covers behavior")
+	}
+	scenarios := differentialScenarios()
+	want := runRubyOracle(t, ruby, scenarios)
+	compareScenarios(t, scenarios, want)
+
+	// The committed golden file must agree with the live oracle.
+	golden, err := os.ReadFile("oracle_golden.json")
+	if err != nil {
+		t.Fatalf("read golden: %v", err)
+	}
+	var goldenWant []oracleResult
+	if err := json.Unmarshal(golden, &goldenWant); err != nil {
+		t.Fatalf("decode golden: %v", err)
+	}
+	if len(goldenWant) != len(want) {
+		t.Fatalf("golden has %d results, oracle %d; regenerate oracle_golden.json", len(goldenWant), len(want))
+	}
+	for i := range want {
+		if !sameResult(goldenWant[i], want[i]) {
+			t.Errorf("golden out of date at %d (%s); regenerate oracle_golden.json", i, scenarios[i].Name)
+		}
+	}
+}
+
+func sameResult(a, b oracleResult) bool {
+	if (a.Line == nil) != (b.Line == nil) {
+		return false
+	}
+	if a.Line != nil && *a.Line != *b.Line {
+		return false
+	}
+	return a.Ptr == b.Ptr && a.Finished == b.Finished && a.EOF == b.EOF
+}
+
+// TestRegenGolden regenerates oracle_golden.json from the live MRI oracle. It is
+// a maintenance helper, only active when GEN_GOLDEN=1 and a Reline ruby exists.
+func TestRegenGolden(t *testing.T) {
+	if os.Getenv("GEN_GOLDEN") != "1" {
+		t.Skip("set GEN_GOLDEN=1 to regenerate the golden file")
+	}
+	ruby := findOracleRuby(t)
+	if ruby == "" {
+		t.Skip("no Reline ruby")
+	}
+	want := runRubyOracle(t, ruby, differentialScenarios())
+	data, err := json.MarshalIndent(want, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile("oracle_golden.json", append(data, '\n'), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("wrote %d golden results", len(want))
 }

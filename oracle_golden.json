@@ -1,0 +1,218 @@
+[
+  {
+    "line": "hello world",
+    "ptr": 11,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "Xhello",
+    "ptr": 1,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "foobar",
+    "ptr": 6,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": " gammaalpha beta",
+    "ptr": 16,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "alpha beta",
+    "ptr": 10,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "ba",
+    "ptr": 2,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "bac",
+    "ptr": 2,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "bar foo",
+    "ptr": 7,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "FOO bar",
+    "ptr": 3,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "foo BAR",
+    "ptr": 3,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "Foo bar",
+    "ptr": 3,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "ello",
+    "ptr": 0,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "hell",
+    "ptr": 4,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "hello world",
+    "ptr": 11,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "",
+    "ptr": 0,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "first",
+    "ptr": 5,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "foo bar baz",
+    "ptr": 7,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "foo bar baz",
+    "ptr": 8,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "é漢",
+    "ptr": 5,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "foo.bar ",
+    "ptr": 8,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "hello",
+    "ptr": 1,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "foo bar baz",
+    "ptr": 4,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "foo bar",
+    "ptr": 2,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "ello",
+    "ptr": 0,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "aZb",
+    "ptr": 2,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": " bar",
+    "ptr": 0,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "bar",
+    "ptr": 0,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "",
+    "ptr": 0,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "xxxlo",
+    "ptr": 3,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "hello",
+    "ptr": 2,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "hello world",
+    "ptr": 4,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "foo.bar baz.qux",
+    "ptr": 8,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "ehllo",
+    "ptr": 1,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "3abcdef",
+    "ptr": 2,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "a\nb",
+    "ptr": 1,
+    "finished": false,
+    "eof": false
+  },
+  {
+    "line": "done",
+    "ptr": 4,
+    "finished": true,
+    "eof": false
+  }
+]
