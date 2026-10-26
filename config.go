@@ -50,6 +50,23 @@ func NewConfig() *Config {
 	return c
 }
 
+// AddDefaultKeyBinding binds the byte sequence keystroke to the command fn in
+// the default keymap of mode (MRI Config#add_default_key_binding_by_keymap,
+// which adds to the same Base actor the mode's mapping filled): the bindings a
+// host's terminal gives its cursor and editing keys (see SetANSIKeyBindings).
+// It replaces a binding of the same sequence; one-shot and inputrc-style
+// additional bindings still win over it. An empty keystroke is ignored.
+func (c *Config) AddDefaultKeyBinding(mode EditingMode, keystroke []byte, fn string) {
+	if len(keystroke) == 0 {
+		return
+	}
+	key := make([]int, len(keystroke))
+	for i, b := range keystroke {
+		key[i] = int(b)
+	}
+	c.defaultActor(mode).add(key, fn)
+}
+
 // EditingMode returns the current mode.
 func (c *Config) EditingMode() EditingMode { return c.editingMode }
 
