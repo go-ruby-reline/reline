@@ -101,6 +101,7 @@ func init() {
 		"kill_whole_line":         (*LineEditor).emKillLine,
 		"em_delete":               (*LineEditor).emDelete,
 		"delete_char":             (*LineEditor).emDelete,
+		"key_delete":              (*LineEditor).keyDelete,
 		"em_delete_or_list":       (*LineEditor).emDeleteOrList,
 		"delete_char_or_list":     (*LineEditor).emDeleteOrList,
 		"em_yank":                 (*LineEditor).emYank,
@@ -391,6 +392,16 @@ func (le *LineEditor) emDelete(c cmdCtx) {
 		next := le.bufferOfLines[le.lineIndex+1]
 		le.bufferOfLines = append(le.bufferOfLines[:le.lineIndex+1], le.bufferOfLines[le.lineIndex+2:]...)
 		le.setCurrentLine(cur+next, len(cur), true)
+	}
+}
+
+// keyDelete is the Delete key (MRI key_delete): the next character in vi
+// insert mode, em_delete in emacs mode, nothing in vi command mode.
+func (le *LineEditor) keyDelete(c cmdCtx) {
+	if le.config.EditingModeIs(ModeViInsert) {
+		le.edDeleteNextChar(c)
+	} else if le.config.EditingModeIs(ModeEmacs) {
+		le.emDelete(c)
 	}
 }
 
